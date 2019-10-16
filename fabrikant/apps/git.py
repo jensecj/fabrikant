@@ -9,9 +9,9 @@ def latest_commit(c, runner, repo):
     cmd = "cd {} && git log --format='%H %ai %B' -n 1".format(repo)
     commit = runner(cmd, hide=True, warn=True).stdout.strip().split()
     id = commit[0]
-    date = " ".join(commit[1:4])
+    timestamp = " ".join(commit[1:4])
     msg = " ".join(commit[4:])
-    return id, date, msg
+    return id, timestamp, msg
 
 
 @set_runner
