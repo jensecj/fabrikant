@@ -211,3 +211,13 @@ def remove(c, runner, path, recursive=False):
     recursive = "-r" if recursive else ""
     cmd = "rm {} {}".format(recursive, path)
     return runner(cmd, hide=True, warn=True).ok
+
+
+@set_runner
+def md5(c, runner, file):
+    """
+    Return the MD5 sum of `file'.
+    """
+    cmd = "md5sum {}".format(file)
+    md5 = runner(cmd, hide=True, warn=True).stdout.strip().split()
+    return md5[0]
