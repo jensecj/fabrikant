@@ -50,15 +50,29 @@ def branch(c, runner, repo):
 def is_clean(c, runner, repo):
     """
     Return True if `repo' is clean (has no uncommitted changes).
+    Return False if `repo' is dirty.
     """
     cmd = "cd {} && git diff --quiet".format(repo)
-    return runner(cmd, hide=True, warn=True).ok
+    ret = runner(cmd, hide=True, warn=True)
+
+    if ret.return_code == 0:
+        return True
+    elif ret.return_code == 1:
+        return False
 
 
 @set_runner
 def is_dirty(c, runner, repo):
     """
     Return True if `repo' is dirty (has uncommitted changes).
+    Return False if `repo' is clean.
     """
-    return not is_clean(c, repo, runner=runner)
+    cmd = "cd {} && git diff --quiet".format(repo)
+    ret = runner(cmd, hide=True, warn=True)
+
+    if ret.return_code == 1:
+        return True
+    elif ret.return_code == 0:
+        return False
+
 
