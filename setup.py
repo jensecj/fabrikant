@@ -10,6 +10,6 @@ setup(
     author="Jens Christian Jensen",
     author_email="jensecj@gmail.com",
     url="http://github.com/jensecj/fabrikant",
-    install_requires=["fabric>=2.0,<3.0"],
+    install_requires=["fabric>=2.5.0,<3.0"],
     packages=find_packages(),
 )
