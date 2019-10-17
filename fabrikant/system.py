@@ -1,7 +1,16 @@
 from .util import set_runner
-
 from .fs import exists
-from .environment import has_program
+
+# * environment
+
+
+@set_runner
+def has_program(c, runner, program):
+    """
+    Return True if  `program' is in in $PATH.
+    """
+    cmd = "which {}".format(program)
+    return runner(cmd, hide=True, warn=True).ok
 
 
 @set_runner
@@ -43,8 +52,11 @@ def hostname(c, runner):
     return hostname
 
 
+# * users
+
+
 @set_runner
-def user(c, runner):
+def current_user(c, runner):
     """
     Return the current user.
     """
@@ -64,16 +76,6 @@ def users_online(c, runner):
 
 
 @set_runner
-def groups(c, runner):
-    """
-    Return all groups on the system.
-    """
-    cmd = "groups"
-    groups = runner(cmd, hide=True, warn=True).stdout.strip().split()
-    return groups
-
-
-@set_runner
 def user_exists(c, runner, user):
     """
     Return True if `user' exists.
@@ -84,6 +86,24 @@ def user_exists(c, runner, user):
 
 
 @set_runner
+def create_user(c, runner, group):
+    pass
+
+
+# * groups
+
+
+@set_runner
+def groups(c, runner):
+    """
+    Return all groups on the system.
+    """
+    cmd = "groups"
+    groups = runner(cmd, hide=True, warn=True).stdout.strip().split()
+    return groups
+
+
+@set_runner
 def group_exists(c, runner, group):
     """
     Return True if `group' exists.
@@ -91,3 +111,8 @@ def group_exists(c, runner, group):
     cmd = "groups"
     groups = runner(cmd, hide=True, warn=True).stdout.strip()
     return group in groups
+
+
+@set_runner
+def create_group(c, runner, group):
+    pass
