@@ -1,5 +1,5 @@
 from ..util import set_runner
-from ..fs import exists
+from ..fs import is_directory
 
 
 @set_runner
@@ -53,7 +53,7 @@ def is_clean(c, runner, repo):
     Return True if `repo' is clean (has no uncommitted changes).
     Return False if `repo' is dirty.
     """
-    if not exists(c, repo, runner=runner):
+    if not is_directory(c, repo, runner=runner):
         return None
 
     cmd = "cd {} && git diff --quiet".format(repo)
@@ -71,7 +71,7 @@ def is_dirty(c, runner, repo):
     Return True if `repo' is dirty (has uncommitted changes).
     Return False if `repo' is clean.
     """
-    if not exists(c, repo, runner=runner):
+    if not is_directory(c, repo, runner=runner):
         return None
 
     cmd = "cd {} && git diff --quiet".format(repo)
