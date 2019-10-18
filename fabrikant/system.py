@@ -7,7 +7,10 @@ from .fs import exists
 @set_runner
 def has_program(c, runner, program):
     """
-    Return True if `program' is in in $PATH.
+    Return True if system can locate `program'.
+
+    For managed programs, see `is_installed' in the specific package
+    manager in fabrikant.apps.
     """
     cmd = "which {}".format(program)
     return runner(cmd, hide=True, warn=True).ok
@@ -45,7 +48,7 @@ def distro(c, runner):
 @set_runner
 def hostname(c, runner):
     """
-    Return the hostname of the machine.
+    Return the hostname of the system.
     """
     cmd = "hostname"
     hostname = runner(cmd, hide=True, warn=True).stdout.strip()
@@ -53,6 +56,7 @@ def hostname(c, runner):
 
 
 # * users
+# ** accessors
 
 
 @set_runner
@@ -75,6 +79,9 @@ def users_online(c, runner):
     return users
 
 
+# ** predicates
+
+
 @set_runner
 def user_exists(c, runner, user):
     """
@@ -82,6 +89,9 @@ def user_exists(c, runner, user):
     """
     cmd = "id -u {}".format(user)
     return runner(cmd, hide=True, warn=True).ok
+
+
+# ** mutators
 
 
 @set_runner
@@ -98,7 +108,20 @@ def create_user(c, runner, user, group=None, shell=None):
     return runner(cmd, hide=True, warn=True).ok
 
 
-# * accessors
+@set_runner
+def remove_user(c, runner, user):
+    """
+    Return True if `user' does not exist, or removing `user' succeeds.
+    """
+    if not user_exists(c, user, runner=runner):
+        return True
+
+    cmd = "userdel {}".format(user)
+    return runner(cmd, hide=True, warn=True).ok
+
+
+# * groups
+# ** accessors
 
 
 @set_runner
@@ -127,7 +150,7 @@ def user_groups(c, runner, user):
         return output.stdout.strip().split()
 
 
-# * predicates
+# ** predicates
 
 
 @set_runner
@@ -154,11 +177,35 @@ def user_in_group(c, runner, user, group):
     return user in groups
 
 
-# * mutators
+# ** mutators
 
 
 @set_runner
-def user_add_group(c, runner, user, group):
+def create_group(c, runner, group):
+    """
+    Return True if `group' already exists, or creating `group' succeeds.
+    """
+    if group_exists(c, group, runner=runner):
+        return True
+
+    cmd = "groupadd {}".format(group)
+    return runner(cmd, hide=True, warn=True).ok
+
+
+@set_runner
+def remove_group(c, runner, group):
+    """
+    Return True if `group' does not exist, or removing `group' succeeds.
+    """
+    if not group_exists(c, group, runner=runner):
+        return True
+
+    cmd = "groupdel {}".format(group)
+    return runner(cmd, hide=True, warn=True).ok
+
+
+@set_runner
+def group_add_user(c, runner, user, group):
     """
     Return True if `user' is already a member of `group', or adding `user' to `group' succeeds.
     Return None if either `user' or `group' does not exist.
@@ -172,8 +219,24 @@ def user_add_group(c, runner, user, group):
     if user_in_group(c, user, group, runner=runner):
         return True
 
-    group = "-G {}".format(group)
-    cmd = "usermod {} {}".format(group, user)
+    cmd = "gpasswd -a {} {}".format(user, group)
     return runner(cmd, hide=True, warn=True).ok
 
 
+@set_runner
+def group_remove_user(c, runner, user, group):
+    """
+    Return True if `user' is not a member of `group', or removing `user' from `group' succeeds.
+    Return None if either `user' or `group' does not exist.
+    """
+    if not user_exists(c, user, runner=runner):
+        return None
+
+    if not group_exists(c, group, runner=runner):
+        return None
+
+    if not user_in_group(c, user, group, runner=runner):
+        return True
+
+    cmd = "gpasswd -d {} {}".format(user, group)
+    return runner(cmd, hide=True, warn=True).ok
