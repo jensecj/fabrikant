@@ -92,7 +92,8 @@ def touch(c, runner, file):
     return runner(cmd, hide=True, warn=True).ok
 
 
-def create_symlink(c, source, destination):
+@set_runner
+def create_symlink(c, runner, source, destination):
     """
     Return `True` if creating a symlink from `source' to `destination' succeeded.
     """
@@ -112,7 +113,7 @@ def copy(c, runner, source, destination, recursive=False):
 
 
 @set_runner
-def move(c, source, destination):
+def move(c, runner, source, destination):
     """
     Return True if moving `source' to `destination' succeeds.
     """
