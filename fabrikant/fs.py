@@ -166,26 +166,13 @@ def overwrite_file(c, runner, contents, file):
 
 
 @set_runner
-def create_directory(c, runner, directory, user=None, group=None, mode=None):
+def create_directory(c, runner, directory):
     """
     Return True if creating `directory', and settings its user, group,
     and mode all succeed.
     """
     cmd = "mkdir -p {}".format(directory)
-    mkdir = runner(cmd).ok
-
-    chown = True
-    chgrp = True
-    if user is not None:
-        group = group or user
-        chown = change_owner(c, directory, user)
-        chgrp = change_group(c, directory, group)
-
-    chmod = True
-    if mode is not None:
-        chmod = change_mode(c, directory, mode)
-
-    return mkdir and chown and chgrp and chmod
+    return runner(cmd).ok
 
 
 @set_runner
