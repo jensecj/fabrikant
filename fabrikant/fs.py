@@ -1,4 +1,6 @@
+import os
 import hashlib
+import tempfile
 
 from .util import set_runner
 
@@ -142,6 +144,23 @@ def read_file(c, runner, file):
     if output.ok:
         return output.stdout.strip()
 
+
+@set_runner
+def overwrite_file(c, runner, contents, file):
+    """
+    Return True if writing `contents' to `file' succeeds.
+    """
+    tmp, tmppath = tempfile.mkstemp()
+    try:
+        with open(tmppath, "w") as f:
+            f.write(contents)
+
+        c.put(tmppath, remote=file)
+    finally:
+        os.close(tmp)
+        os.remove(tmppath)
+
+    return True
 
 # ** directories
 
