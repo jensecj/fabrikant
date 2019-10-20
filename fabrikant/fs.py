@@ -2,8 +2,8 @@ import os
 import hashlib
 import tempfile
 
+import system
 from .util import set_runner
-
 
 # * predicates
 
@@ -274,19 +274,59 @@ def time_of_last_change(c, runner, path):
 # * mutators
 
 
-def change_owner(c, path, owner, recursive=False):
-    cmd = "chown {} {}".format(owner, path)
-    return runner(cmd).ok
+@set_runner
+def change_owner(c, runner, path, owner, recursive=False):
+    """
+    Return True if `path' is already owned by `user', or if setting owner to `user' succeeds.
+    Return None if either `path' or `user' does not exist.
+    """
+    if not exists(c, path, runner=runner):
+        return None
+
+    if not system.user_exists(c, user, runner=runner):
+        return None
+
+    if owner_name(c, path, runner=runner) == owner:
+        return True
+
+    recursive = "-R" if recursive else ""
+    cmd = "chown {} {} {}".format(recursive, owner, path)
+    return runner(cmd, hide=True, warn=True).ok
 
 
-def change_group(c, path, group, recursive=False):
-    cmd = "chgrp {} {}".format(group, path)
-    return runner(cmd).ok
+@set_runner
+def change_group(c, runner, path, group, recursive=False):
+    """
+    Return True if `path' is already owned by `group', or if setting owner to `group' succeeds.
+    Return None if either `path' or `group' does not exist.
+    """
+    if not exists(c, path, runner=runner):
+        return None
+
+    if not system.group_exists(c, group, runner=runner):
+        return None
+
+    if owner_group(c, path, runner=runner) == group:
+        return True
+
+    recursive = "-R" if recursive else ""
+    cmd = "chgrp {} {} {}".format(recursive, group, path)
+    return runner(cmd, hide=True, warn=True).ok
 
 
-def change_mode(c, path, mode, recursive=False):
-    cmd = "chmod {} {}".format(mode, path)
-    return runner(cmd).ok
+@set_runner
+def change_mode(c, runner, path, mode, recursive=False):
+    """
+    Return True if `path' is already owned by `user', or if setting owner to `user' succeeds.
+    Return None if `path' does not exist.
+    """
+    if not exists(c, path, runner=runner):
+        return None
+
+    # TODO: validate mode
+    recursive = "-R" if recursive else ""
+    cmd = "chmod {} {} {}".format(recursive, mode, path)
+    return runner(cmd, hide=True, warn=True).ok
 
 
 # * misc
