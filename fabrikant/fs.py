@@ -94,7 +94,8 @@ def create_symlink(c, source, destination):
     """
     Return `True` if creating a symlink from `source' to `destination' succeeded.
     """
-    cmd = "ln -nfs {} {}".format(source, destination)
+    # TODO: check if link exists
+    cmd = "ln -ns {} {}".format(source, destination)
     return runner(cmd).ok
 
 
