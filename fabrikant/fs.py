@@ -92,12 +92,13 @@ def touch(c, runner, file):
 
 
 @set_runner
-def create_symlink(c, runner, source, destination):
+def create_symlink(c, runner, source, destination, force=False):
     """
     Return `True` if creating a symlink from `source' to `destination' succeeded.
     """
     # TODO: check if link exists
-    cmd = "ln -ns {} {}".format(source, destination)
+    force = "-f" if force else ""
+    cmd = "ln -ns {} {} {}".format(force, source, destination)
     return runner(cmd).ok
 
 
