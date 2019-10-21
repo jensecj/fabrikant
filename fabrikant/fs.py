@@ -147,21 +147,27 @@ def read_file(c, runner, file):
 
 
 @set_runner
-def overwrite_file(c, runner, contents, file):
+def write_file(c, runner, contents, file, overwrite=False):
     """
     Return True if writing `contents' to `file' succeeds.
+    Return False if `file' exists, and `overwrite' is False
     """
+    if not overwrite and exists(c, file, runner=runner):
+        return False
+
     tmp, tmppath = tempfile.mkstemp()
     try:
         with open(tmppath, "w") as f:
             f.write(contents)
 
-        c.put(tmppath, remote=file)
+        base = os.path.basename(file)
+        remote_temp = os.path.join("/tmp", base)
+        c.put(tmppath, remote=remote_temp)
+        return move(c, remote_temp, file, runner=runner)
     finally:
         os.close(tmp)
         os.remove(tmppath)
 
-    return True
 
 # ** directories
 
