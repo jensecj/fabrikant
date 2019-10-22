@@ -40,7 +40,9 @@ def change_owner(c, runner, path, user, recursive=False):
     if not user_exists(c, user, runner=runner):
         return None
 
-    if owner_name(c, path, runner=runner) == user:
+    # it is very expensive to know for sure if we own all files in a
+    # path recursively, so we just assume we dont
+    if not recursive and owner_name(c, path, runner=runner) == user:
         return True
 
     recursive = "-R" if recursive else ""
@@ -60,7 +62,9 @@ def change_group(c, runner, path, group, recursive=False):
     if not group_exists(c, group, runner=runner):
         return None
 
-    if owner_group(c, path, runner=runner) == group:
+    # it is very expensive to know for sure if we own all files in a
+    # path recursively, so we just assume we dont
+    if not recursive and owner_group(c, path, runner=runner) == group:
         return True
 
     recursive = "-R" if recursive else ""
