@@ -75,7 +75,7 @@ def change_group(c, runner, path, group, recursive=False):
 @set_runner
 def change_mode(c, runner, path, mode, recursive=False):
     """
-    Return True if `path' is already owned by `user', or if setting owner to `user' succeeds.
+    Return True if setting mode of `path' to `mode' succeeds.
     Return None if `path' does not exist.
     """
     if not exists(c, path, runner=runner):
@@ -84,4 +84,21 @@ def change_mode(c, runner, path, mode, recursive=False):
     # TODO: validate mode
     recursive = "-R" if recursive else ""
     cmd = "chmod {} {} {}".format(recursive, mode, path)
+    return runner(cmd, hide=True, warn=True).ok
+
+
+@set_runner
+def change_attributes(c, runner, path, attributes, recursive=False):
+    """
+    Return True if setting attributes of `path' to `attributes' succeeds.
+    Return None if `path' does not exist.
+    """
+    if not exists(c, path, runner=runner):
+        return None
+
+    # TODO: rewrite so no string arguments are taken, all attributes should be kwargs
+
+    # TODO: validate attributes
+    recursive = "-R" if recursive else ""
+    cmd = "chattr {} {} {}".format(recursive, attributes, path)
     return runner(cmd, hide=True, warn=True).ok
